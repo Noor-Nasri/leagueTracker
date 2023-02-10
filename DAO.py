@@ -8,6 +8,7 @@ class DAO_Object():
     def __init__(self):
         firebase = pyrebase.initialize_app(firebase_config)
         self.db = firebase.database()
+        self.current_matchup = None
 
     def sign_up(self, author, nickname: str) -> bool:
         # Creates a new folder for the player and links it to the discord tag
@@ -73,7 +74,7 @@ class DAO_Object():
         all_player_ids = self.db.child("users").shallow().get().val()
         player_ids = []
         for member_id in member_ids:
-            if member_id in all_player_ids:
+            if str(member_id) in all_player_ids:
                 player_ids.append(member_id)
         
         if not player_ids: return -3
@@ -94,6 +95,7 @@ class DAO_Object():
             banlist.append(champs[i])
 
         print(teams)
+        self.current_matchup = teams
         return teams
 
     def accept_matchup(self, teams: List[Dict[str, str]]) -> int:
@@ -116,3 +118,5 @@ class DAO_Object():
         
         self.db.child("matches").child(match_id).update({"Winner": winner_index})
         return True
+
+dao = DAO_Object()
