@@ -3,49 +3,107 @@ from keys import firebase_config, discord_token
 import discord
 from discord.ext import commands, tasks
 from data import champion_pool
-from typing import List
+from typing import List, Dict
 
-def add_player(nickname: str, discord_tag:str) -> bool:
+def sign_up(ctx, nickname: str) -> bool:
     # Creates a new folder for the player and links it to the discord tag
-    # True on success and False when nickname in use OR invalid tag
+    # returns false if it already exists
 
-    pass
+    all_player_ids = db.child("users").shallow().get()
+    player_id = str(ctx.message.author.id)
+    if player_id in all_player_ids.val():
+        return False
 
-def ban_champ(name: str) -> bool:
+    data = {"name": nickname, "wins": 0, "losses": 0}
+    db.child("users").child(player_id).set(data)
+    return True
+
+
+def ban_champ(db, name: str) -> bool:
     # Returns true on success, false on champ not found
 
-    pass
+    name = name.upper()
+    if not name in champion_pool:
+        return False
+    
+    banlist = db.child("banlist").get().val()
+    if not name in banlist:
+        banlist.append(name)
+        db.child("banlist").set(banlist)
 
-def unban_champ(name: str) -> bool:
+    print(banlist)
+    return True
+
+
+def unban_champ(db, name: str) -> bool:
     # Returns true on success, false on champ not found
 
-    pass
+    name = name.upper()
+    banlist = db.child("banlist").get().val()
+    if not name in banlist:
+        return False
 
-def get_banlist() -> List[str]:
+    banlist.remove(name)
+    db.child("banlist").set(banlist)
+    print(banlist)
+    return True
+
+
+def get_banlist(db) -> List[str]:
     # Returns a list of champion names
 
-    pass
+    return db.child("banlist").get().val()[1:]
 
-async def generate_matchup(ctx): 
-    # Still figuring out return
+
+def generate_matchup(ctx) -> List[Dict[str, str]]:
+    # Generates a valid matchup and returns it in [{"ziadom" : "Yorick"}, {team 2}]
+    # If -1 is returned, display "ERROR: You are not connected to a voice channel"
+    # If -2 is returned, display "Uneven number of players in voice channel"
 
     if not (ctx.author.voice and ctx.author.voice.channel):
-        await ctx.send("You are not connected to a voice channel")
-        return 
+        return []
 
     channel = ctx.author.voice.channel
+    member_ids = channel.voice_states.keys()
+    print(member_ids)
+    return []
 
-    await ctx.channel.send("WIP")
+def accept_matchup(teams: List[Dict[str, str]]) -> int:
+    # Saves the matchup and remembers the integer 
+    pass
+
+def conclude_match(match_id: int, winner_index: int) -> bool:
+    # Saves winner of the match, returns false if id or index is invalid
+    pass
+    
 
 if __name__ == "__main__":
     # connect to firebase and initialize discord bot
     firebase = pyrebase.initialize_app(firebase_config)
     db = firebase.database()
 
-    client = commands.Bot(command_prefix="/lol_tracker ")
+    print(unban_champ(db, "zoe"))
+    #db.child("banlist").set(["Init"])
+
+    """
+    client = commands.Bot(command_prefix="!")
 
     @client.event
     async def on_ready():
-        await client.change_presence(activity = discord.Game(name = '/lol_tracker help for a list of commands'))
+        await client.change_presence(activity = discord.Game(name = '!help for a list of commands'))
 
-        print("Done")
+        print("Running")
+
+    @client.command()
+    async def test(ctx):
+        print("Got call")
+        await generate_matchup(ctx)
+    
+    @client.command()
+    async def test2(ctx):
+        print("Got call2")
+        await add_player(ctx, "ziadom")
+        
+    client.run(discord_token)
+
+    """
