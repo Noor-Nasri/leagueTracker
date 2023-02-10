@@ -3,6 +3,7 @@ import discord
 from discord import app_commands
 from discord.app_commands import Choice
 from discord.ext import commands
+from data import champion_pool
 
 class MatchCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -16,13 +17,44 @@ class MatchCog(commands.Cog):
         await interaction.response.send_message(f"User {interaction.user.name} has been linked with {ign}")
 
     @app_commands.command(
-            name = "ban_champ",
-            description = "bans a champ from being picked"
+            name = "banchamp",
+            description = "bans a champ from champ select"
             )
-    # @app_commands.choices(champ = [
     async def ban_champ(self,interaction:discord.Interaction,
                         champ:str):
-        await interaction.response.send_message("ppooy")
+        if champ.title() not in [c for c in champion_pool]:
+            await interaction.response.send_message(f"The champion {champ} doesn't exist")
+        else:
+            await interaction.response.send_message(f"champion has been banned")
+
+    @app_commands.command(
+            name = "unbanchamp",
+            description = "unbans a champ from champ select"
+            )
+    async def unban_champ(self,interaction:discord.Interaction,
+                          champ:str):
+        if champ.title() not in champion_pool:
+            await interaction.response.send_message(f"The champion {champ.title()} doesn't exist")
+        else:
+            await interaction.response.send_message(f"champion has been unbanned")
+
+    @app_commands.command(
+            name = "banlist",
+            description = "gets banlist"
+            )
+    async def banlist(self,interaction:discord.Interaction):
+        await interaction.response.send_message("poo")
+
+    @app_commands.command(
+            name = "creatematch",
+            description = "creates match"
+            )
+    async def creatematch(self,interaction:discord.Interaction):
+        await interaction.response.send_message("poo")
+
+
+    
+             
         
 async def setup(bot: commands.Bot):
     await bot.add_cog(MatchCog(bot))

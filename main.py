@@ -5,6 +5,9 @@ from discord.ext import commands, tasks
 from data import champion_pool
 from typing import List, Dict
 from random import shuffle
+class DB():
+    init():
+
 
 def sign_up(ctx, nickname: str) -> bool:
     # Creates a new folder for the player and links it to the discord tag
