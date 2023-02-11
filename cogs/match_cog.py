@@ -15,7 +15,7 @@ class CreateMatchMenu(ui.View):
         await interaction.response.edit_message(view = SelectWinnerMenu())
     @ui.button(label = "Reroll")
     async def reroll(self, interaction: discord.Interaction, Button: ui.Button):
-        await interaction.response.edit_message(content = dao.generate_matchup(interaction.user))
+        await interaction.response.edit_message(content = dao.generate_matchup(interaction.user)[:2])
 class SelectWinnerMenu(ui.View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -81,7 +81,7 @@ class MatchCog(commands.Cog):
             await interaction.response.send_message("There was an error")
         else:
 
-            await interaction.response.send_message(dao.current_matchup,
+            await interaction.response.send_message(dao.current_matchup[:2],
                                                 view = CreateMatchMenu())
 
 

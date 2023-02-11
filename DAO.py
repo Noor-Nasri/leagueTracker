@@ -80,7 +80,7 @@ class DAO_Object():
         if not player_ids: return -3
         if len(player_ids) % 2 != 0: return -2
 
-        teams = [{}, {}]
+        teams = [{}, {},{}]
         banlist = self.get_banlist()
         champs = champion_pool[:]
         shuffle(champs)
@@ -92,6 +92,7 @@ class DAO_Object():
                 champs.pop(i)
 
             teams[i % 2][username] = champs[i] 
+            teams[2][username] = player_ids[i]
             banlist.append(champs[i])
 
         print(teams)
