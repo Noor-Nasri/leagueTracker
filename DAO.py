@@ -98,25 +98,27 @@ class DAO_Object():
         self.current_matchup = teams
         return teams
 
-    def accept_matchup(self, teams: List[Dict[str, str]]) -> int:
+    def accept_matchup(self) -> int:
         # Saves the matchup and remembers the integer 
 
         num_matches = len(self.db.child("matches").shallow().get().val())
-        data = {"Team 0": [teams[2][e] for e in teams[0].keys()], 
-                "Team 1": [teams[2][e] for e in teams[1].keys()], 
+        data = {"Team 0": [self.current_matchup[2][e] for e in teams[0].keys()], 
+                "Team 1": [self.current_matchup[2][e] for e in teams[1].keys()], 
                 "Winner": -1}
         
         self.db.child("matches").child(num_matches).set(data)
+        self.current_match_id = num_matches
+
         return num_matches
 
-    def conclude_match(self, match_id: int, winner_index: int) -> bool:
+    def conclude_match(self, winner_index: int) -> bool:
         # Saves winner of the match, returns false if id or index is invalid
 
         matches = self.db.child("matches").shallow().get().val()
-        if not str(match_id) in matches or winner_index != 0 and winner_index != 1:
+        if not str(self.current_match_id) in matches or winner_index != 0 and winner_index != 1:
             return False
         
-        self.db.child("matches").child(match_id).update({"Winner": winner_index})
+        self.db.child("matches").child(self.current_match_id).update({"Winner": winner_index})
         return True
 
 dao = DAO_Object()

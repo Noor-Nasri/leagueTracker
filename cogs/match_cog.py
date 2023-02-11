@@ -11,7 +11,7 @@ class CreateMatchMenu(ui.View):
         super().__init__(timeout=None)
     @ui.button(label = "Accept")
     async def accept(self, interaction: discord.Interaction, Button: ui.Button):
-        # dao.accept_matchup()
+        dao.accept_matchup()
         await interaction.response.edit_message(view = SelectWinnerMenu())
     @ui.button(label = "Reroll")
     async def reroll(self, interaction: discord.Interaction, Button: ui.Button):
@@ -21,10 +21,12 @@ class SelectWinnerMenu(ui.View):
         super().__init__(timeout=None)
     @ui.button(label = "Team1")
     async def team1(self, interaction: discord.Interaction, Button: ui.Button):
-        pass
+        dao.conclude_match(0)
+        await interaction.response.edit_message(view = None, content = "Team 1 won")
     @ui.button(label = "Team2")
     async def team2(self, interaction:discord.Interaction, Button: ui.Button):
-        pass
+        dao.conclude_match(1)
+        await interaction.response.edit_message(view = None, content = "Team 2 won")
 
 class MatchCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -75,8 +77,11 @@ class MatchCog(commands.Cog):
             description = "creates match"
             )
     async def creatematch(self,interaction:discord.Interaction):
-        print("hello")
-        await interaction.response.send_message(dao.generate_matchup(interaction.user),
+        if isinstance(dao.generate_matchup(interaction.user),int):
+            await interaction.response.send_message("There was an error")
+        else:
+
+            await interaction.response.send_message(dao.current_matchup,
                                                 view = CreateMatchMenu())
 
 
