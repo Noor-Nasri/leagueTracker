@@ -102,8 +102,8 @@ class DAO_Object():
         # Saves the matchup and remembers the integer 
 
         num_matches = len(self.db.child("matches").shallow().get().val())
-        data = {"Team 0": [self.current_matchup[2][e] for e in teams[0].keys()], 
-                "Team 1": [self.current_matchup[2][e] for e in teams[1].keys()], 
+        data = {"Team 0": [self.current_matchup[2][e] for e in self.current_matchup[0].keys()], 
+                "Team 1": [self.current_matchup[2][e] for e in self.current_matchup[1].keys()], 
                 "Winner": -1}
         
         self.db.child("matches").child(num_matches).set(data)
